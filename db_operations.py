@@ -8,14 +8,13 @@ import sqlite3
 imageDB = sqlite3.connect("imageDB.db")
 cursor = imageDB.cursor()
 
-# Insert test data.
-cursor.execute("INSERT INTO PARKINGSPOT (isOccupied) VALUES (1);")
+
 
 # Commit any changes.
-imageDB.commit()
+# imageDB.commit()
 
 # Select test data.
-cursor.execute("SELECT * FROM PARKINGSPOT;")
+# cursor.execute("SELECT * FROM PARKINGSPOT;")
 
 # Retrieve rows from PARKINGSPOT table
 rows = cursor.fetchall()
