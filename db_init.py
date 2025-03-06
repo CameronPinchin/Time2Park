@@ -4,7 +4,7 @@
 
 
 import sqlite3
-from picamera2 import Picamera2
+
 
 # Create a connection to the database, and initalize the cursor
 imageDB = sqlite3.connect("imageDB.db")

@@ -3,12 +3,15 @@
 # Purpose: File handles database operations.
 
 import sqlite3
+from picamera2 import Picamera2
 
 # Create a connection to the database, and initalize the cursor
 imageDB = sqlite3.connect("imageDB.db")
 cursor = imageDB.cursor()
 
-
+# Every 3-5 minutes take a photo, upload data to the DB.
+# Not required to store the whole photo, analyze for the presence of a car
+# then store that information in the DB. 
 
 # Commit any changes.
 # imageDB.commit()
