@@ -47,7 +47,13 @@ def detectCars(frame):
         count += 1
 
     print(count, " cars found")
-    Image.formarray(image_arr)
+    Image.fromarray(image_arr)
+
+
+testImage1 = Image.open(requests.get('https://a57.foxnews.com/media.foxbusiness.com/BrightCove/854081161001/201805/2879/931/524/854081161001_5782482890001_5782477388001-vs.jpg',
+                                stream=True).raw)
+
+detectCars(testImage1)
 
     
 
