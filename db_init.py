@@ -12,9 +12,10 @@ cursor = imageDB.cursor()
 
 cursor.execute("DROP TABLE IF EXISTS PARKINGSPOT")
 
-# Define the table
+# Define the table, add attribute for spot 1 - 3
 table = """ CREATE TABLE PARKINGSPOT(
             ID INTEGER PRIMARY KEY,
+            parkingSpot INTEGER,
             isOccupied INTEGER,
             TIMESTAMP TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP)
         ); """
