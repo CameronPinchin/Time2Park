@@ -1,4 +1,13 @@
-from __future__ import print_function
+#          Author: Cameron Pinchin
+#      Start Date: March 6th, 2025
+#     Recent Date: March 9th, 2025
+#     Description: Program dedicated to analyzing photos
+#                  taken from the Pi-Camera to determine
+#                  the presence of cars in the three available
+#                  spots out front of my house.
+# External Sources: cars.xml for detection of cars.
+#             link: https://gist.github.com/199995/37e1e0af2bf8965e8058a9dfa3285bc6
+
 from PIL import Image
 from picamzero import Camera
 import os
@@ -84,10 +93,6 @@ def detect_cars(frame):
     Image.fromarray(closing)
 
     # Need car cascade to detect cars
-
-    # Need to define a deadzone on the street
-    # - Crop original image to remove the street
-
     car_cascade_src = 'cars.xml'
     car_cascade = cv.CascadeClassifier(car_cascade_src)
     cars = car_cascade.detectMultiScale(closing, 1.1, 1)
@@ -100,7 +105,13 @@ def detect_cars(frame):
         count += 1
 
     print(count, " cars found")
-    Image.formarray(image_arr)
+    Image.fromarray(image_arr)
+
+
+testImage1 = Image.open(requests.get('https://a57.foxnews.com/media.foxbusiness.com/BrightCove/854081161001/201805/2879/931/524/854081161001_5782482890001_5782477388001-vs.jpg',
+                                stream=True).raw)
+
+detectCars(testImage1)
 
     
 
