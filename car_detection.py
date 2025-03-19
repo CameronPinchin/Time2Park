@@ -53,19 +53,6 @@ def take_and_crop_photo():
     img_parent = Image.open(f"{home_dir}/img/img.jpg")
     img_parent = img_parent.crop((0, cropped_height, length, height))
 
-    img_manipulate = cv2.imread(f"{home_dir}/img/img.jpg")
-
-    # Define ROIs for image
-    roi_parking_spot_one = img_parent[1296:648, 0:864]
-    roi_parking_spot_two = img_parent[1296:648, 1728:]
-    roi_parking_spot_three = img_parent[1296:1296, 864:2592]
-
-    cv2.imshow("Show selected ROI: ", roi_parking_spot_one)
-    cv2.imshow("Show selected ROI: ", roi_parking_spot_two)
-    cv2.imshow("Show selected ROI: ", roi_parking_spot_three)
-
-    
-
 
 def detect_cars(frame):
     # Car Detection Testing with online image
@@ -97,14 +84,39 @@ def detect_cars(frame):
     car_cascade = cv.CascadeClassifier(car_cascade_src)
     cars = car_cascade.detectMultiScale(closing, 1.1, 1)
 
+    # Define ROIs for image
+    roi_parking_spot_one = cars[1296:648, 0:864]
+    roi_parking_spot_two = cars[1296:648, 1728:]
+    roi_parking_spot_three = cars[1296:1296, 864:2592]
+
+    cv.imshow("Show selected ROI: ", roi_parking_spot_one)
+    cv.imshow("Show selected ROI: ", roi_parking_spot_two)
+    cv.imshow("Show selected ROI: ", roi_parking_spot_three)
+
     # Draw rectangles around cars
 
-    count = 0
-    for (x, y, w, h) in cars:
-        cv.rectangle(image_arr, (x,y), (x+w, y+h), (255, 0, 0), 2)
-        count += 1
+    count_roi_one = 0
+    count_roi_two = 0
+    count_roi_three = 0
+    for (y1, y2, x1, x2) in roi_parking_spot_one:
+        cv.rectangle(image_arr, (x1+y1),(x1 + x2, y1 + y2), (255, 0, 0), 2)
+        count_roi_one += 1
 
-    print(count, " cars found")
+    for (y1, y2, x1, x2) in roi_parking_spot_one:
+        cv.rectangle(image_arr, (x1+y1),(x1 + x2, y1 + y2), (255, 0, 0), 2)
+        count_roi_two += 1
+
+    for (y1, y2, x1, x2) in roi_parking_spot_one:
+        cv.rectangle(image_arr, (x1+y1),(x1 + x2, y1 + y2), (255, 0, 0), 2)
+        count_roi_three += 1
+    
+    # for (x, y, w, h) in cars:
+    #    cv.rectangle(image_arr, (x,y), (x+w, y+h), (255, 0, 0), 2)
+    #    count += 1
+
+    print(count_roi_one, " cars found in ROI one")
+    print(count_roi_two, " cars found in ROI two")
+    print(count_roi_three, " cars found in ROI three")
     Image.fromarray(image_arr)
 
 
