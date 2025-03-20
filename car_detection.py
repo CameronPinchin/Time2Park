@@ -16,14 +16,13 @@ import argparse
 import numpy as np
 import requests
 
+# Define length and height of each image globally
+length = 2592 
+height = 1944
+cropped_height = height * (1/3)
+
 
 def take_and_crop_photo():
-
-    # Define length and height of each image
-    length = 2592 
-    height = 1944
-    cropped_height = height * (1/3)
-
     # Define region of interest values
     # These will need further definitions and error checking.
 
@@ -55,10 +54,7 @@ def take_and_crop_photo():
 
 
 def detect_cars(frame):
-    # Car Detection Testing with online image
     
-    frame = frame.resize((450, 250))
-
     # convert image into numpy array
     image_arr = np.array(frame)
 
@@ -85,15 +81,14 @@ def detect_cars(frame):
     cars = car_cascade.detectMultiScale(closing, 1.1, 1)
 
     # Define ROIs for image
-    roi_parking_spot_one = cars[1296:648, 0:864]
-    roi_parking_spot_two = cars[1296:648, 1728:]
-    roi_parking_spot_three = cars[1296:1296, 864:2592]
+    roi_parking_spot_one = cars[648:1296, 0:864]
+    roi_parking_spot_two = cars[648:1296, 864:1728]
+    roi_parking_spot_three = cars[648:1296, 864:2592]
 
+    # Confirm ROIs were selected properly
     cv.imshow("Show selected ROI: ", roi_parking_spot_one)
     cv.imshow("Show selected ROI: ", roi_parking_spot_two)
     cv.imshow("Show selected ROI: ", roi_parking_spot_three)
-
-    # Draw rectangles around cars
 
     count_roi_one = 0
     count_roi_two = 0
@@ -123,7 +118,7 @@ def detect_cars(frame):
 testImage1 = Image.open(requests.get('https://a57.foxnews.com/media.foxbusiness.com/BrightCove/854081161001/201805/2879/931/524/854081161001_5782482890001_5782477388001-vs.jpg',
                                 stream=True).raw)
 
-detectCars(testImage1)
+detect_cars(testImage1)
 
     
 
