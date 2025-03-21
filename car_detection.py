@@ -19,28 +19,12 @@ import requests
 # Define length and height of each image globally
 length = 2592 
 height = 1944
-cropped_height = height * (1/3)
+cropped_height = 648
 
 
 def take_and_crop_photo():
     # Define region of interest values
     # These will need further definitions and error checking.
-
-    roi_one_x1 = 0
-    roi_one_y1 = 648
-    roi_one_x2 = 864
-    roi_one_y2 = 1296
-
-    roi_two_x1 = 864
-    roi_two_y1 = 648
-    roi_two_x2 = 1728
-    roi_two_y2 = 1296
-
-    roi_three_x1 = 864
-    roi_three_y1 = 1296
-    roi_three_x2 = 2592
-    roi_three_y2 = 1296
-    
 
     home_dir = os.environ['~']
     cam = Camera()
@@ -49,14 +33,21 @@ def take_and_crop_photo():
     cam.take_photo(f"{home_dir}/img/img.jpg")
     cam.stop_preview()
 
-    img_parent = Image.open(f"{home_dir}/img/img.jpg")
-    img_parent = img_parent.crop((0, cropped_height, length, height))
+    img_parent = cv.imread('img.jpg')
+    img_parent = img_parent[cropped_height:height, 0:length]
 
+    return img_parent
 
 def detect_cars(frame):
     
     # convert image into numpy array
     image_arr = np.array(frame)
+   
+    rois = [
+        (0, 648, 864, 648),
+        (864, 648, 864, 648),
+        (864, 648, 1728, 648)
+    ]
 
     # Convert image to greyscale
     frame_grey = cv.cvtColor(image_arr, cv.COLOR_BGR2GRAY)
@@ -78,47 +69,21 @@ def detect_cars(frame):
     # Need car cascade to detect cars
     car_cascade_src = 'cars.xml'
     car_cascade = cv.CascadeClassifier(car_cascade_src)
-    cars = car_cascade.detectMultiScale(closing, 1.1, 1)
-
-    # Define ROIs for image
-    roi_parking_spot_one = cars[648:1296, 0:864]
-    roi_parking_spot_two = cars[648:1296, 864:1728]
-    roi_parking_spot_three = cars[648:1296, 864:2592]
-
-    # Confirm ROIs were selected properly
-    cv.imshow("Show selected ROI: ", roi_parking_spot_one)
-    cv.imshow("Show selected ROI: ", roi_parking_spot_two)
-    cv.imshow("Show selected ROI: ", roi_parking_spot_three)
-
-    count_roi_one = 0
-    count_roi_two = 0
-    count_roi_three = 0
-    for (y1, y2, x1, x2) in roi_parking_spot_one:
-        cv.rectangle(image_arr, (x1+y1),(x1 + x2, y1 + y2), (255, 0, 0), 2)
-        count_roi_one += 1
-
-    for (y1, y2, x1, x2) in roi_parking_spot_one:
-        cv.rectangle(image_arr, (x1+y1),(x1 + x2, y1 + y2), (255, 0, 0), 2)
-        count_roi_two += 1
-
-    for (y1, y2, x1, x2) in roi_parking_spot_one:
-        cv.rectangle(image_arr, (x1+y1),(x1 + x2, y1 + y2), (255, 0, 0), 2)
-        count_roi_three += 1
     
-    # for (x, y, w, h) in cars:
-    #    cv.rectangle(image_arr, (x,y), (x+w, y+h), (255, 0, 0), 2)
-    #    count += 1
+    car_counts = {}
+    for (x, y, w, h) in rois:
+        roi_frame = closing[y:y+h, x:x+w]
+        cars = car_cascade.detectMultiScale(roi_frame, 1.1, 1)
+        car_counts[(x, y, w, h)] = len(cars)
 
-    print(count_roi_one, " cars found in ROI one")
-    print(count_roi_two, " cars found in ROI two")
-    print(count_roi_three, " cars found in ROI three")
-    Image.fromarray(image_arr)
+        for (cx, cy, cw, ch) in cars:
+        
+            cv.rectangle(image_arr, (cx + x, cy + y), (cx + x + cw, cy + y + ch), (0, 255, 0), 2)
+
+    for roi, count in car_counts.items():
+        print(f"ROI {roi} detected {count} cars")
 
 
-testImage1 = Image.open(requests.get('https://a57.foxnews.com/media.foxbusiness.com/BrightCove/854081161001/201805/2879/931/524/854081161001_5782482890001_5782477388001-vs.jpg',
-                                stream=True).raw)
-
-detect_cars(testImage1)
 
     
 
