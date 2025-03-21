@@ -1,6 +1,6 @@
 #          Author: Cameron Pinchin
 #      Start Date: March 6th, 2025
-#     Recent Date: March 9th, 2025
+#     Recent Date: March 21st, 2025
 #     Description: Program dedicated to analyzing photos
 #                  taken from the Pi-Camera to determine
 #                  the presence of cars in the three available
@@ -9,12 +9,13 @@
 #             link: https://gist.github.com/199995/37e1e0af2bf8965e8058a9dfa3285bc6
 
 from PIL import Image
-from picamzero import Camera
+from picamera2 import Picamera2
 import os
 import cv2 as cv
 import argparse
 import numpy as np
 import requests
+import time
 
 # Define length and height of each image globally
 length = 2592 
@@ -23,17 +24,15 @@ cropped_height = 648
 
 
 def take_and_crop_photo():
-    # Define region of interest values
-    # These will need further definitions and error checking.
-
+    
     home_dir = os.environ['~']
-    cam = Camera()
-
-    cam.start_preview()
-    cam.take_photo(f"{home_dir}/img/img.jpg")
-    cam.stop_preview()
-
-    img_parent = cv.imread('img.jpg')
+    cam = Picamera2()
+    camera_config = cam.create_prewview_configuration(main={"size": (length, height)})
+    cam.configure(camera_config)
+    
+    img = cam.capture_array()
+  
+    img_parent = cv.imread(img)
     img_parent = img_parent[cropped_height:height, 0:length]
 
     return img_parent
