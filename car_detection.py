@@ -39,7 +39,7 @@ def take_and_crop_photo():
 
 def detect_cars(frame):
     
-    # convert image into numpy array
+    # convert image into numpyarray
     image_arr = np.array(frame)
    
     rois = [
