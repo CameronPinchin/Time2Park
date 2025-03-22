@@ -110,13 +110,16 @@ def detect_cars(frame, conn, cursor):
     car_counts = {}
     for (x, y, w, h) in rois:
         roi_frame = closing[y:y+h, x:x+w]
-        cars = car_cascade.detectMultiScale(roi_frame, 1.1, 1)
+        cars = car_cascade.detectMultiScale(roi_frame, scaleFactor=1.2, minNeighbors=10, minSize=(50,50))
         car_counts[(x, y, w, h)] = len(cars)
 
         for (cx, cy, cw, ch) in cars:
-        
-            cv.rectangle(image_arr, (cx + x, cy + y), (cx + x + cw, cy + y + ch), (0, 255, 0), 2)
+            abs_x = cx + x
+            abs_y = cy + y
+            cv.rectangle(image_arr, (abs_x, abs_y), (abs_x + cw, abs_y + ch), (0, 255, 0), 2)
+            
 
+    cv.imwrite("roi_preview.jpg", image_arr)
     for roi, count in car_counts.items():
         print(f"ROI {roi} detected {count} cars")
 
@@ -150,11 +153,7 @@ def add_to_database(counts, conn, cursor):
 
     conn.commit()
 
-    print("Data inserted into table: ")
-    cursor.execute("SELECT * FROM PARKINGSPOT")
-    rows = cursor.fetchall()
-    for row in rows:
-        print("ROW: ", row)
+    
 
 
 

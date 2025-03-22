@@ -28,3 +28,13 @@ def db_initialize():
 
     # Close conneciton to SQlite.
     return imageDB, cursor
+
+def reset_db():
+    imageDB = sqlite3.connect("imageDB.db")
+    cursor = imageDB.cursor()
+
+    cursor.execute("DROP TABLE IF EXISTS PARKINGSPOT")
+
+    imageDB.commit()
+
+    imageDB.close()
