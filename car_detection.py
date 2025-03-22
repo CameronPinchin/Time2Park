@@ -16,26 +16,51 @@ import argparse
 import numpy as np
 import requests
 import time
+import random
+import glob2 as glob
 
 # Define length and height of each image globally
 length = 2592 
 height = 1944
 cropped_height = 648
 
+img_folder = os.path.expanduser("~/Desktop/Time2Park/img/")
+
 
 def take_and_crop_photo():
-    
-    home_dir = os.environ['~']
-    cam = Picamera2()
-    camera_config = cam.create_prewview_configuration(main={"size": (length, height)})
-    cam.configure(camera_config)
-    
-    img = cam.capture_array()
-  
-    img_parent = cv.imread(img)
-    img_parent = img_parent[cropped_height:height, 0:length]
 
-    return img_parent
+    while True:
+        current_time = time.time()
+        five_minutes_ahead = current_time + 300
+
+        current_time = current_time // 1
+        five_minutes_ahead = five_minutes_ahead // 1
+        
+        rand_time = random.randint(current_time, five_minutes_ahead)
+                
+        time_to_wait = rand_time - time.time()
+
+        while True:
+            current_time = time.time()
+            if abs(current_time - rand_time):
+                print(f"Random time {rand_time} reached, capturing image.")
+
+                cam = Picamera2()
+                camera_config = cam.create_preview_configuration(main={"size": (length, height)})
+                cam.configure(camera_config)
+                cam.start()
+
+                img_path = f"{img_folder}{rand_time}.jpg"
+                cam.capture_file(img_path)
+    
+                img_parent = cv.imread(img_path)
+                img_parent = img_parent[cropped_height:height, 0:length]
+
+                detect_cars(img_parent)
+            
+            else:
+
+                time.sleep(0.1)   
 
 def detect_cars(frame):
     
@@ -81,6 +106,17 @@ def detect_cars(frame):
 
     for roi, count in car_counts.items():
         print(f"ROI {roi} detected {count} cars")
+
+    jpg_files = glob.glob(f"{img_folder}*.jpg")
+
+    for f in jpg_files:
+        os.remove(f)
+        print(f"Deleted: {f}")
+
+    
+
+
+take_and_crop_photo()
 
 
 
