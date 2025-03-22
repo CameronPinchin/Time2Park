@@ -119,7 +119,7 @@ def detect_cars(frame, conn, cursor):
             cv.rectangle(image_arr, (abs_x, abs_y), (abs_x + cw, abs_y + ch), (0, 255, 0), 2)
             
 
-    cv.imwrite("roi_preview.jpg", image_arr)
+    # cv.imwrite("roi_preview.jpg", image_arr)
     for roi, count in car_counts.items():
         print(f"ROI {roi} detected {count} cars")
 
