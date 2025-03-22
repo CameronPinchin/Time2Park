@@ -18,6 +18,7 @@ import requests
 import time
 import random
 import glob2 as glob
+import sqlite3
 
 # Define length and height of each image globally
 length = 2592 
@@ -26,9 +27,10 @@ cropped_height = 648
 
 img_folder = os.path.expanduser("~/Desktop/Time2Park/img/")
 
+#imageDB = sqlite3.connect("imageDB.db")
+#cursor = imageDB.cursor()
 
-def take_and_crop_photo():
-
+def take_and_crop_photo(conn, cursor):
     while True:
         current_time = time.time()
         five_minutes_ahead = current_time + 300
@@ -39,38 +41,49 @@ def take_and_crop_photo():
         rand_time = random.randint(current_time, five_minutes_ahead)
                 
         time_to_wait = rand_time - time.time()
+        
 
         while True:
             current_time = time.time()
             if abs(current_time - rand_time):
                 print(f"Random time {rand_time} reached, capturing image.")
 
+                
+
+                img_path = f"{img_folder}{rand_time}.jpg"
+                
                 cam = Picamera2()
                 camera_config = cam.create_preview_configuration(main={"size": (length, height)})
                 cam.configure(camera_config)
+
                 cam.start()
-
-                img_path = f"{img_folder}{rand_time}.jpg"
+                time.sleep(2)
                 cam.capture_file(img_path)
-    
-                img_parent = cv.imread(img_path)
-                img_parent = img_parent[cropped_height:height, 0:length]
+                cam.stop()
+                cam.close()
 
-                detect_cars(img_parent)
+                img_parent = cv.imread(img_path)
+                
+                # img_parent = img_parent[cropped_height:height, 0:length]
+                
+                detect_cars(img_parent, conn, cursor)
+
+                break
             
             else:
 
-                time.sleep(0.1)   
+                time.sleep(0.1) 
 
-def detect_cars(frame):
-    
+        
+
+def detect_cars(frame, conn, cursor):
     # convert image into numpyarray
     image_arr = np.array(frame)
    
     rois = [
-        (0, 648, 864, 648),
-        (864, 648, 864, 648),
-        (864, 648, 1728, 648)
+        (0, 648, 864, 1296),
+        (864, 648, 864, 1296),
+        (1728, 648, 864, 1296)
     ]
 
     # Convert image to greyscale
@@ -107,16 +120,47 @@ def detect_cars(frame):
     for roi, count in car_counts.items():
         print(f"ROI {roi} detected {count} cars")
 
+    add_to_database(car_counts, conn, cursor)
+
     jpg_files = glob.glob(f"{img_folder}*.jpg")
 
     for f in jpg_files:
         os.remove(f)
         print(f"Deleted: {f}")
 
+    take_and_crop_photo(conn, cursor)
+
+def add_to_database(counts, conn, cursor):
+    just_rois = list(counts.keys())
+    just_counts = list(counts.values())
+
     
+    if just_counts[0] == 0:
+        cursor.execute('''INSERT INTO PARKINGSPOT (parkingSpot, isOccupied) VALUES (1, 0)''')
+    else: 
+        cursor.execute('''INSERT INTO PARKINGSPOT (parkingSpot, isOccupied) VALUES (1, 1)''')
+    if just_counts[1] == 0:
+        cursor.execute('''INSERT INTO PARKINGSPOT (parkingSpot, isOccupied) VALUES (2, 0)''')
+    else:
+        cursor.execute('''INSERT INTO PARKINGSPOT (parkingSpot, isOccupied) VALUES (2, 1)''')
+    if just_counts[2] == 0:
+        cursor.execute('''INSERT INTO PARKINGSPOT (parkingSpot, isOccupied) VALUES (3, 0)''')
+    else:
+        cursor.execute('''INSERT INTO PARKINGSPOT (parkingSpot, isOccupied) VALUES (3, 1) ''')
+
+    conn.commit()
+
+    print("Data inserted into table: ")
+    cursor.execute("SELECT * FROM PARKINGSPOT")
+    rows = cursor.fetchall()
+    for row in rows:
+        print("ROW: ", row)
 
 
-take_and_crop_photo()
+
+
+
+
 
 
 

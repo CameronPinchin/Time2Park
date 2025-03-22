@@ -7,21 +7,24 @@ import sqlite3
 
 
 # Create a connection to the database, and initalize the cursor
-imageDB = sqlite3.connect("imageDB.db")
-cursor = imageDB.cursor()
+def db_initialize():
 
-cursor.execute("DROP TABLE IF EXISTS PARKINGSPOT")
+    imageDB = sqlite3.connect("imageDB.db")
+    cursor = imageDB.cursor()
 
-# Define the table, add attribute for spot 1 - 3
-table = """ CREATE TABLE PARKINGSPOT(
-            ID INTEGER PRIMARY KEY,
-            parkingSpot INTEGER,
-            isOccupied INTEGER,
-            TIMESTAMP TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP)
-        ); """
+    # Define the table, add attribute for spot 1 - 3
+    table = """ CREATE TABLE IF NOT EXISTS PARKINGSPOT(
+                ID INTEGER PRIMARY KEY,
+                parkingSpot INTEGER,
+                isOccupied INTEGER,
+                TIMESTAMP TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP)
+            ); """
 
-# Initialize the table.
-cursor.execute(table)
+    # Initialize the table.
+    cursor.execute(table)
 
-# Close conneciton to SQlite.
-cursor.close()
+    # Commit changes to DB
+    imageDB.commit()
+
+    # Close conneciton to SQlite.
+    return imageDB, cursor
