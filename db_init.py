@@ -1,6 +1,7 @@
 # Project: Time2Park 
 #  Author: Cameron Pinchin
 # Purpose: File defines the database schema, and initalizes the database.
+#          Provides a db_reset() function to reset the db.
 
 
 import sqlite3
@@ -29,7 +30,7 @@ def db_initialize():
     # Close conneciton to SQlite.
     return imageDB, cursor
 
-def reset_db():
+def db_reset():
     imageDB = sqlite3.connect("imageDB.db")
     cursor = imageDB.cursor()
 
