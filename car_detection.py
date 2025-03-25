@@ -31,7 +31,14 @@ img_folder = os.path.expanduser("~/Desktop/Time2Park/img/")
 #cursor = imageDB.cursor()
 
 def take_and_crop_photo(conn, cursor):
+# Loop for continuous photo capture, analysis, and insertion into imageDB
+# Handles the deletion of photos after analysis, saving space and more secure
+
     while True:
+
+        # Measures current time with time() import
+        # - Produces a random time between current and current + 300 seconds (five minutes)
+        # To ensure I am not taking a photo at the same time each day.
         current_time = time.time()
         five_minutes_ahead = current_time + 300
 
@@ -40,10 +47,12 @@ def take_and_crop_photo(conn, cursor):
         
         rand_time = random.randint(current_time, five_minutes_ahead)
                 
-        time_to_wait = rand_time - time.time()
+       
         
-
+        
         while True:
+        
+            # Measure current time again, 
             current_time = time.time()
             if abs(current_time - rand_time):
                 print(f"Random time {rand_time} reached, capturing image.")
