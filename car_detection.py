@@ -33,9 +33,7 @@ img_folder = os.path.expanduser("~/Desktop/Time2Park/img/")
 def take_and_crop_photo(conn, cursor):
 # Loop for continuous photo capture, analysis, and insertion into imageDB
 # Handles the deletion of photos after analysis, saving space and more secure
-
     while True:
-
         # Measures current time with time() import
         # - Produces a random time between current and current + 300 seconds (five minutes)
         # To ensure I am not taking a photo at the same time each day.
@@ -47,17 +45,12 @@ def take_and_crop_photo(conn, cursor):
         
         rand_time = random.randint(current_time, five_minutes_ahead)
                 
-       
-        
-        
         while True:
         
             # Measure current time again, 
             current_time = time.time()
             if abs(current_time - rand_time):
                 print(f"Random time {rand_time} reached, capturing image.")
-
-                
 
                 img_path = f"{img_folder}{rand_time}.jpg"
                 
@@ -72,15 +65,11 @@ def take_and_crop_photo(conn, cursor):
                 cam.close()
 
                 img_parent = cv.imread(img_path)
-                
-                # img_parent = img_parent[cropped_height:height, 0:length]
-                
+                                
                 detect_cars(img_parent, conn, cursor)
 
                 break
-            
             else:
-
                 time.sleep(0.1) 
 
         
@@ -127,8 +116,6 @@ def detect_cars(frame, conn, cursor):
             abs_y = cy + y
             cv.rectangle(image_arr, (abs_x, abs_y), (abs_x + cw, abs_y + ch), (0, 255, 0), 2)
             
-
-    # cv.imwrite("roi_preview.jpg", image_arr)
     for roi, count in car_counts.items():
         print(f"ROI {roi} detected {count} cars")
 
@@ -143,7 +130,6 @@ def detect_cars(frame, conn, cursor):
     take_and_crop_photo(conn, cursor)
 
 def add_to_database(counts, conn, cursor):
-    just_rois = list(counts.keys())
     just_counts = list(counts.values())
 
     
