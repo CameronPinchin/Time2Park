@@ -132,19 +132,11 @@ def detect_cars(frame, conn, cursor):
 def add_to_database(counts, conn, cursor):
     just_counts = list(counts.values())
 
-    
-    if just_counts[0] == 0:
-        cursor.execute('''INSERT INTO PARKINGSPOT (parkingSpot, isOccupied) VALUES (1, 0)''')
-    else: 
-        cursor.execute('''INSERT INTO PARKINGSPOT (parkingSpot, isOccupied) VALUES (1, 1)''')
-    if just_counts[1] == 0:
-        cursor.execute('''INSERT INTO PARKINGSPOT (parkingSpot, isOccupied) VALUES (2, 0)''')
-    else:
-        cursor.execute('''INSERT INTO PARKINGSPOT (parkingSpot, isOccupied) VALUES (2, 1)''')
-    if just_counts[2] == 0:
-        cursor.execute('''INSERT INTO PARKINGSPOT (parkingSpot, isOccupied) VALUES (3, 0)''')
-    else:
-        cursor.execute('''INSERT INTO PARKINGSPOT (parkingSpot, isOccupied) VALUES (3, 1) ''')
+    for i, count in enumerate(just_counts, start = 1):
+        cursor.execute(
+            "INSERT INTO PARKINGSPOT (parkingSpot, isOccupied) VALUES ?, ?"           
+            (i, 0 if count == 0 else 1)
+        )
 
     data = cursor.execute("SELECT * FROM PARKINGSPOT")
 
