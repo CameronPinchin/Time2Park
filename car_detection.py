@@ -146,6 +146,11 @@ def add_to_database(counts, conn, cursor):
     else:
         cursor.execute('''INSERT INTO PARKINGSPOT (parkingSpot, isOccupied) VALUES (3, 1) ''')
 
+    data = cursor.execute("SELECT * FROM PARKINGSPOT")
+
+    for row in data:
+        print(row)
+
     conn.commit()
 
     
