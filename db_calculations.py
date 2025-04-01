@@ -32,14 +32,22 @@ def find_day(conn, cur):
         date = date_tuple[0]
         date_string_start = f"{date} 12:00:00"
         date_string_end = f"{date} 23:30:00"
-        search_string = "SELECT * FROM PARKINGSPOT WHERE TIMESTAMP BETWEEN ? AND ?"
+        date_search_string = "SELECT * FROM PARKINGSPOT WHERE TIMESTAMP BETWEEN ? AND ?"
 
-        data_for_the_day = cur.execute(search_string, (date_string_start, date_string_end))
+        data_for_the_day = cur.execute(date_search_string, (date_string_start, date_string_end))
         for data in data_for_the_day:
             id, parking_spot, is_occupied, timestamp = data
             print(f"ID: {id}, Spot #: {parking_spot}, Occupied: {is_occupied}, Timestamp: {timestamp}")
 
            
+# Current thoughts:
+#  - Can basically do a findMin/findMax function to identify the longest amount of time isOccupied continually is zero.
+#  - Can temporarily store the current 'longest' time and compare it to a calculated value for a given day
+#  - Once that day has been exhausted, whatever the 'longest' variable equals, will be the longest availability for that day
+#           - So, I must also store the starting ID and ending ID for each iteration, so I can then go back
+#           - and assign peak_availability_start and peak_availability_end into the ANALYSIS table
+#  - Same logic generally applies to occupancy rate
+#  
 
 
 find_day(imageDB, cursor)
