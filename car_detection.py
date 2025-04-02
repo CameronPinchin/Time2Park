@@ -25,14 +25,11 @@ length = 2592
 height = 1944
 cropped_height = 648
 
-# Change this to be dynamic --> i.e., whenever any given user is running this, it will
-# automatically detect the CWD.
 cwd = os.getcwd()
 img_folder = os.path.join(cwd, 'img')
 
 #imageDB = sqlite3.connect("imageDB.db")
 #cursor = imageDB.cursor()
-
 def take_and_crop_photo(conn, cursor):
 # Loop for continuous photo capture, analysis, and insertion into imageDB
 # Handles the deletion of photos after analysis, saving space and more secure
@@ -49,7 +46,6 @@ def take_and_crop_photo(conn, cursor):
         rand_time = random.randint(current_time, five_minutes_ahead)
                 
         while True:
-        
             # Measure current time again, 
             current_time = time.time()
             if abs(current_time - rand_time):
@@ -75,12 +71,9 @@ def take_and_crop_photo(conn, cursor):
             else:
                 time.sleep(0.1) 
 
-        
-
 def detect_cars(frame, conn, cursor):
     # convert image into numpyarray
     image_arr = np.array(frame)
-   
     rois = [
         (0, 648, 864, 1296),
         (864, 648, 864, 1296),

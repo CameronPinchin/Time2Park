@@ -38,7 +38,6 @@ def db_reset():
     cursor = imageDB.cursor()
 
     cursor.execute("DROP TABLE IF EXISTS PARKINGSPOT")
-
+    
     imageDB.commit()
-
     imageDB.close()

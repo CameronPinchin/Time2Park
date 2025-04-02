@@ -14,9 +14,7 @@ from picamera2 import Picamera2
 imageDB = sqlite3.connect("imageDB.db")
 cursor = imageDB.cursor()
 
-
 def find_day(conn, cur):
-
     # Gather unique IDs
     entry_ids = cur.execute("SELECT DISTINCT ID FROM PARKINGSPOT")
     unique_ids = []
@@ -39,7 +37,6 @@ def find_day(conn, cur):
             id, parking_spot, is_occupied, timestamp = data
             print(f"ID: {id}, Spot #: {parking_spot}, Occupied: {is_occupied}, Timestamp: {timestamp}")
 
-           
 # Current thoughts:
 #  - Can basically do a findMin/findMax function to identify the longest amount of time isOccupied continually is zero.
 #  - Can temporarily store the current 'longest' time and compare it to a calculated value for a given day
@@ -51,7 +48,6 @@ def find_day(conn, cur):
 # ADDING TO THE ANALYSIS DB
 # - One ID for a given day
 #   - So, only add to the db after the data_for_the_day executes
-
 
 find_day(imageDB, cursor)
 
