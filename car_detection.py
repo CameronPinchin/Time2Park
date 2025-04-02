@@ -25,7 +25,10 @@ length = 2592
 height = 1944
 cropped_height = 648
 
-img_folder = os.path.expanduser("~/Desktop/Time2Park/img/")
+# Change this to be dynamic --> i.e., whenever any given user is running this, it will
+# automatically detect the CWD.
+cwd = os.getcwd()
+img_folder = os.path.join(cwd, 'img')
 
 #imageDB = sqlite3.connect("imageDB.db")
 #cursor = imageDB.cursor()
@@ -144,6 +147,13 @@ def add_to_database(counts, conn, cursor):
         print(row)
 
     conn.commit()
+
+def delete_files():
+    jpg_files = glob.glob(f"{img_folder}*.jpg")
+
+    for f in jpg_files:
+        os.remove(f)
+        print(f"Deleted: {f}")
 
     
 

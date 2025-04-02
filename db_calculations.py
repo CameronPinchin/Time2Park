@@ -48,6 +48,9 @@ def find_day(conn, cur):
 #           - and assign peak_availability_start and peak_availability_end into the ANALYSIS table
 #  - Same logic generally applies to occupancy rate
 #  
+# ADDING TO THE ANALYSIS DB
+# - One ID for a given day
+#   - So, only add to the db after the data_for_the_day executes
 
 
 find_day(imageDB, cursor)
