@@ -129,10 +129,22 @@ def add_to_database(counts, conn, cursor):
     just_counts = list(counts.values())
 
     for i, count in enumerate(just_counts, start = 1):
-        cursor.execute(
-            "INSERT INTO PARKINGSPOT (parkingSpot, isOccupied) VALUES ?, ?"           
-            (i, 0 if count == 0 else 1)
-        )
+        if i == 0:
+            cursor.execute(
+                "INSERT INTO PARKINGSPOT (parkingOne, isOccupied) VALUES ?, ?"
+                (1, 0 if count == 0 else 1)
+            )
+        if i == 1:
+            cursor.execute(
+                "INSERT INTO PARKINGSPOT (parkingTwo, isOccupied) VALUE ?, ?"
+                (1, 0 if count == 0 else 1)
+            )
+        if i == 2:
+            cursor.execute(
+                "INSERT INTO PARKINGSPOT (parkingThree, isOccupied) VALUE ?, ?"
+                (1, 0 if count == 0 else 1)
+            )
+        
 
     data = cursor.execute("SELECT * FROM PARKINGSPOT")
 

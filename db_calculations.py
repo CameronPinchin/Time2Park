@@ -8,6 +8,7 @@
 import sqlite3 
 import numpy
 import cv2
+import datetime
 from picamera2 import Picamera2
 
 # Connnect with the DB
@@ -25,30 +26,62 @@ def find_day(conn, cur):
     # Store unique dates within database
     dates = cur.execute("SELECT DISTINCT DATE(TIMESTAMP) FROM PARKINGSPOT")
 
+    timestamps = []
+    is_occupied_values = []
+
+
     # Begin search based on dates to calculate data for each day
     for date_tuple in dates:
         date = date_tuple[0]
         date_string_start = f"{date} 12:00:00"
-        date_string_end = f"{date} 23:30:00"
+        date_string_end = f"{date} 23:59:00"
         date_search_string = "SELECT * FROM PARKINGSPOT WHERE TIMESTAMP BETWEEN ? AND ?"
 
-        data_for_the_day = cur.execute(date_search_string, (date_string_start, date_string_end))
+        cur.execute(date_search_string, (date_string_start, date_string_end))
+        data_for_the_day = cur.fetchall()
+
         for data in data_for_the_day:
-            id, parking_spot, is_occupied, timestamp = data
-            print(f"ID: {id}, Spot #: {parking_spot}, Occupied: {is_occupied}, Timestamp: {timestamp}")
+            id, parking_one, parking_two, parking_three, timestamp, is_occupied = data
+            timestamps.append(datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S"))
+            is_occupied_values.append(is_occupied)
 
-# Current thoughts:
-#  - Can basically do a findMin/findMax function to identify the longest amount of time isOccupied continually is zero.
-#  - Can temporarily store the current 'longest' time and compare it to a calculated value for a given day
-#  - Once that day has been exhausted, whatever the 'longest' variable equals, will be the longest availability for that day
-#           - So, I must also store the starting ID and ending ID for each iteration, so I can then go back
-#           - and assign peak_availability_start and peak_availability_end into the ANALYSIS table
-#  - Same logic generally applies to occupancy rate
-#  
-# ADDING TO THE ANALYSIS DB
-# - One ID for a given day
-#   - So, only add to the db after the data_for_the_day executes
+# This will need some reworking
 
+            if parking_one == 1:
+                parking_spots.append(0)
+            elif parking_two == 1:
+                parking_spots.append(1)
+            elif parking_three == 1:
+                parking_spots.append(2)
+
+
+        occupation_streak = []
+        parking_spots = []
+        start_index = -1
+
+        for i in range(len(is_occupied_values)):
+            if is_occupied_values[i] == 0:
+                if start_index == -1:
+                    start_index = i
+            else:
+                if start_index == -1:
+                    occupation_streak.append((timestamps[start_index], timestamps[i - 1]))
+                    start_index = -1
+
+        if start_index != -1:
+            occupation_streak.append((parking_spots[start_index], timestamps[start_index], timestamps[-1]))
+
+        streak_duration = [(spot, start, end, (end - start).total_seconds()) for spot, start, end, in occupation_streak]
+
+        for spot, start, end, duration in streak_duration:
+            cursor.execute(
+                """INSERT INTO ANALYSIS (parkingSpot, peak_availability_start,
+                           peak_availability_end, availability_duration) VALUES ?, ?, ?, ?"""
+                           (spot, start, end, duration)
+                           )
+            
+            print("Successful insertion into analysis database.")
+                   
 find_day(imageDB, cursor)
 
         

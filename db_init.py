@@ -10,7 +10,9 @@ def db_initialize():
     # Define the table, add attribute for spot 1 - 3
     parking_data_table = """ CREATE TABLE IF NOT EXISTS PARKINGSPOT(
                         ID INTEGER PRIMARY KEY,
-                        parkingSpot INTEGER,
+                        parkingOne INTEGER,
+                        parkingTwo INTEGER,
+                        parkingThree INTEGER,
                         isOccupied INTEGER,
                         TIMESTAMP TEXT NOT NULL DEFAULT (CURRENT_TIMESTAMP)
                     ); """
@@ -20,10 +22,7 @@ def db_initialize():
                         parkingSpot INTEGER NOT NULL,
                         peak_availability_start TEXT NOT NULL,
                         peak_availability_end TEXT NOT NULL,
-                        peak_occupancy_start TEXT NOT NULL,
-                        peak_occupancy_end TEXT NOT NULL,
-                        avg_occupancy_rate REAL NOT NULL,
-                        avg_availability_rate REAL NOT NULL
+                        availability_duration TEXT NOT NULL
                     )"""
     # Initialize the tables.
     cursor.execute(parking_data_table)
